@@ -1,0 +1,8 @@
+flowchart LR
+    A[AstraOS Orchestrator] --> B[Laptop 42%]
+    A --> C[Jetson Nano 36%]
+    A --> D[Raspberry Pi 22%]
+    B --> E[Partial Inference Results]
+    C --> E
+    D --> E
+    E --> F[Latency-Aware Aggregation]

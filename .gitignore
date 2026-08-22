@@ -1,0 +1,56 @@
+# ── Python ─────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# ── C / C++ ─────────────────────────────────────────────────────────────
+*.o
+*.exe
+monitoring/astra-monitor
+
+# ── Node / Frontend ─────────────────────────────────────────────────────
+node_modules/
+dashboard/node_modules/
+dashboard/dist/
+dashboard/.vite/
+dashboard/dev-server.log
+dashboard/dev-server.err.log
+website/node_modules/
+website/dist/
+website/.next/
+website/dev-server.log
+website/dev-server.err.log
+.pnpm-store/
+
+# ── Runtime logs ─────────────────────────────────────────────────────────
+api-server.log
+api-server.out.log
+api-server.err.log
+api-debug.out.log
+api-debug.err.log
+
+# ── Database / Storage ───────────────────────────────────────────────────
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# ── Secrets ──────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+website/.env.local
+dashboard/.env.local
+
+# ── IDE / OS ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

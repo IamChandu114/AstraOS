@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant M as Monitoring Daemon
+    participant AI as AI Runtime
+    participant P as Policy Engine
+    participant O as Optimizers
+    participant K as Linux Kernel
+    M->>AI: 1s telemetry window
+    AI->>AI: LSTM + RF + anomaly scoring
+    AI->>P: Predicted overload and confidence
+    P->>O: Ranked optimization actions
+    O->>K: Affinity, priority, memory, power actions
+    K->>M: Feedback metrics
+    M->>AI: Post-action telemetry

@@ -1,0 +1,19 @@
+{
+  "summary": "AstraOS optimization demo benchmark",
+  "metrics": [
+    {"name": "CPU Latency", "unit": "ms", "before": 120, "after": 74},
+    {"name": "Thermal Peak", "unit": "C", "before": 94, "after": 81},
+    {"name": "Memory Efficiency", "unit": "%", "before": 68, "after": 84},
+    {"name": "Power Draw", "unit": "W", "before": 31, "after": 24},
+    {"name": "AI Inference", "unit": "FPS", "before": 41, "after": 63}
+  ],
+  "decision_log": [
+    "00:00 workload stress detected; telemetry confidence 0.91",
+    "00:07 predicted CPU overload in 18 seconds",
+    "00:09 predicted temperature 94 C; thermal migration selected",
+    "00:12 moved inference workload to performance core 2",
+    "00:15 packed background tasks onto efficiency core 4",
+    "00:21 distributed inference: Laptop 42%, Jetson Nano 36%, Raspberry Pi 22%",
+    "00:38 thermal peak reduced to 81 C"
+  ]
+}

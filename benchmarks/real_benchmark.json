@@ -1,0 +1,78 @@
+{
+  "timestamp": 1779346313.5108736,
+  "status": "real_benchmark",
+  "apply_requested": false,
+  "optimization_plan": {
+    "timestamp": 1779346245.7692945,
+    "mode": "plan",
+    "actions": [
+      {
+        "type": "memory_pressure",
+        "reason": "Memory pressure detected from real RAM telemetry.",
+        "apply_supported": false,
+        "linux_commands": [
+          "sync",
+          "echo 1 > /proc/sys/vm/drop_caches"
+        ],
+        "safe_default": "recommend_only"
+      }
+    ],
+    "requires_apply_enabled": true
+  },
+  "optimization_result": {
+    "mode": "plan_only",
+    "results": []
+  },
+  "before": {
+    "cpu_percent_avg": 93.97,
+    "memory_percent_avg": 86.71,
+    "thermal_peak_c": null,
+    "processes": 334,
+    "latency_median_ms": 15.7502,
+    "latency_p95_ms": 16.5643,
+    "disk_kbps": 8202.92,
+    "network_rx_kbps": 6.98
+  },
+  "after": {
+    "cpu_percent_avg": 35.76,
+    "memory_percent_avg": 86.83,
+    "thermal_peak_c": null,
+    "processes": 330,
+    "latency_median_ms": 15.4267,
+    "latency_p95_ms": 16.6367,
+    "disk_kbps": 1375.19,
+    "network_rx_kbps": 1.32
+  },
+  "metrics": [
+    {
+      "name": "CPU Latency p95",
+      "unit": "ms",
+      "before": 16.5643,
+      "after": 16.6367
+    },
+    {
+      "name": "CPU Usage Avg",
+      "unit": "%",
+      "before": 93.97,
+      "after": 35.76
+    },
+    {
+      "name": "Memory Usage Avg",
+      "unit": "%",
+      "before": 86.71,
+      "after": 86.83
+    },
+    {
+      "name": "Thermal Peak",
+      "unit": "C",
+      "before": null,
+      "after": null
+    },
+    {
+      "name": "Network RX",
+      "unit": "KB/s",
+      "before": 6.98,
+      "after": 1.32
+    }
+  ]
+}

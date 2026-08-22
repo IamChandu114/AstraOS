@@ -1,0 +1,16 @@
+{
+  "processes": [
+    {"pid": 4281, "name": "chrome", "cpu": 31.2, "memory": 18.4, "state": "S", "priority": 0},
+    {"pid": 5310, "name": "astra-inference", "cpu": 72.6, "memory": 24.1, "state": "R", "priority": 0},
+    {"pid": 6112, "name": "python-trainer", "cpu": 45.0, "memory": 34.8, "state": "R", "priority": 0},
+    {"pid": 1022, "name": "sync-agent", "cpu": 4.3, "memory": 5.1, "state": "S", "priority": 0},
+    {"pid": 873, "name": "indexer", "cpu": 8.9, "memory": 8.2, "state": "S", "priority": 0}
+  ],
+  "metrics": [
+    {"timestamp": 1, "cpu_usage": 51.2, "ram_usage": 58.0, "temperature_c": 62.0, "power_watts": 21.0, "network_kbps": 910.0, "inference_fps": 58.0},
+    {"timestamp": 2, "cpu_usage": 61.8, "ram_usage": 61.4, "temperature_c": 69.5, "power_watts": 24.3, "network_kbps": 980.0, "inference_fps": 51.0},
+    {"timestamp": 3, "cpu_usage": 73.1, "ram_usage": 65.7, "temperature_c": 76.2, "power_watts": 27.8, "network_kbps": 1030.0, "inference_fps": 45.0},
+    {"timestamp": 4, "cpu_usage": 84.4, "ram_usage": 70.3, "temperature_c": 84.6, "power_watts": 31.4, "network_kbps": 1110.0, "inference_fps": 39.0},
+    {"timestamp": 5, "cpu_usage": 88.7, "ram_usage": 74.5, "temperature_c": 88.9, "power_watts": 32.1, "network_kbps": 1190.0, "inference_fps": 37.0}
+  ]
+}

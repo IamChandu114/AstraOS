@@ -1,0 +1,6 @@
+name,unit,before,after
+CPU Latency p95,ms,16.5643,16.6367
+CPU Usage Avg,%,93.97,35.76
+Memory Usage Avg,%,86.71,86.83
+Thermal Peak,C,,
+Network RX,KB/s,6.98,1.32

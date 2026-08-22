@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@theme inline {
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-jetbrains);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --background: #0a0c0d;
+  --foreground: #e9eceb;
+  --card: #101416;
+  --card-foreground: #e9eceb;
+  --muted: #161b1d;
+  --muted-foreground: #84908f;
+  --border: #283031;
+  --primary: #d7e0dd;
+  --primary-foreground: #0a0c0d;
+  --accent: #74d7b4;
+  --accent-foreground: #06100d;
+  --ring: #74d7b4;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--background); scroll-behavior: smooth; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-manrope), sans-serif; }
+::selection { background: #74d7b4; color: #06100d; }
+
+@layer base {
+  * { @apply border-border; }
+  a, button { @apply outline-none; }
+  :focus-visible { box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring); }
+}
+
+.grid-texture { background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 48px 48px; }
+.hairline { border-color: var(--border); }
+.mono { font-family: var(--font-jetbrains), monospace; }
+.eyebrow { font: 500 10px/1.2 var(--font-jetbrains), monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+@media (max-width: 640px) { .grid-texture { background-size: 32px 32px; } }

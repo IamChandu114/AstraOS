@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#091014"/>
+  <rect x="30" y="30" width="1140" height="660" rx="8" fill="#0d181b" stroke="#28424a"/>
+  <text x="64" y="92" fill="#e6edf3" font-family="Arial" font-size="44" font-weight="700">AstraOS</text>
+  <text x="64" y="126" fill="#93a4a8" font-family="Arial" font-size="18">AI-native operating system optimization layer</text>
+  <g transform="translate(64 166)">
+    <rect width="250" height="110" rx="8" fill="#132326" stroke="#28424a"/>
+    <text x="22" y="36" fill="#93a4a8" font-family="Arial" font-size="15">CPU Load</text>
+    <text x="22" y="78" fill="#e6edf3" font-family="Arial" font-size="38" font-weight="700">54%</text>
+  </g>
+  <g transform="translate(334 166)">
+    <rect width="250" height="110" rx="8" fill="#132326" stroke="#28424a"/>
+    <text x="22" y="36" fill="#93a4a8" font-family="Arial" font-size="15">Thermal Peak</text>
+    <text x="22" y="78" fill="#e6edf3" font-family="Arial" font-size="38" font-weight="700">81 C</text>
+  </g>
+  <g transform="translate(604 166)">
+    <rect width="250" height="110" rx="8" fill="#132326" stroke="#28424a"/>
+    <text x="22" y="36" fill="#93a4a8" font-family="Arial" font-size="15">Memory Efficiency</text>
+    <text x="22" y="78" fill="#e6edf3" font-family="Arial" font-size="38" font-weight="700">84%</text>
+  </g>
+  <g transform="translate(874 166)">
+    <rect width="250" height="110" rx="8" fill="#132326" stroke="#28424a"/>
+    <text x="22" y="36" fill="#93a4a8" font-family="Arial" font-size="15">Power Draw</text>
+    <text x="22" y="78" fill="#e6edf3" font-family="Arial" font-size="38" font-weight="700">24 W</text>
+  </g>
+  <rect x="64" y="312" width="700" height="300" rx="8" fill="#132326" stroke="#28424a"/>
+  <text x="90" y="352" fill="#e6edf3" font-family="Arial" font-size="20" font-weight="700">Live CPU Optimization</text>
+  <g fill="#4fd1c5">
+    <rect x="110" y="488" width="60" height="84" rx="6"/>
+    <rect x="205" y="438" width="60" height="134" rx="6"/>
+    <rect x="300" y="378" width="60" height="194" rx="6"/>
+    <rect x="395" y="406" width="60" height="166" rx="6"/>
+    <rect x="490" y="456" width="60" height="116" rx="6"/>
+    <rect x="585" y="474" width="60" height="98" rx="6"/>
+  </g>
+  <rect x="790" y="312" width="334" height="300" rx="8" fill="#132326" stroke="#28424a"/>
+  <text x="816" y="352" fill="#e6edf3" font-family="Arial" font-size="20" font-weight="700">AI Decision Log</text>
+  <text x="816" y="392" fill="#e6edf3" font-family="Arial" font-size="16">1. Predicted CPU overload in 18s</text>
+  <text x="816" y="424" fill="#e6edf3" font-family="Arial" font-size="16">2. Predicted temperature: 94 C</text>
+  <text x="816" y="456" fill="#e6edf3" font-family="Arial" font-size="16">3. Optimization mode activated</text>
+  <text x="816" y="488" fill="#e6edf3" font-family="Arial" font-size="16">4. Edge inference distributed</text>
+</svg>

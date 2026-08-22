@@ -1,0 +1,114 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  astra-api:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      ASTRAOS_DB_PATH: /app/data/astraos.db
+      ASTRAOS_CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      ASTRAOS_EDGE_NODES: astra-node-1=astra-node-1:9101,astra-node-2=astra-node-2:9102,astra-node-3=astra-node-3:9103,astra-node-4=astra-node-4:9104
+    command: sh -c "pip install -r backend/requirements.txt && uvicorn backend.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - astra-node-1
+      - astra-node-2
+      - astra-node-3
+      - astra-node-4
+
+  astra-node-1:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      ASTRAOS_NODE_NAME: astra-node-1
+      ASTRAOS_NODE_ROLE: cpu-worker
+      ASTRAOS_NODE_WORKLOAD: cpu-heavy inference batch
+    command: sh -c "pip install fastapi uvicorn psutil && uvicorn distributed.node_agent:app --host 0.0.0.0 --port 9101"
+
+  astra-node-2:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      ASTRAOS_NODE_NAME: astra-node-2
+      ASTRAOS_NODE_ROLE: memory-worker
+      ASTRAOS_NODE_WORKLOAD: feature-cache pressure
+    command: sh -c "pip install fastapi uvicorn psutil && uvicorn distributed.node_agent:app --host 0.0.0.0 --port 9102"
+
+  astra-node-3:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      ASTRAOS_NODE_NAME: astra-node-3
+      ASTRAOS_NODE_ROLE: network-gateway
+      ASTRAOS_NODE_WORKLOAD: stream aggregation
+    command: sh -c "pip install fastapi uvicorn psutil && uvicorn distributed.node_agent:app --host 0.0.0.0 --port 9103"
+
+  astra-node-4:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    environment:
+      ASTRAOS_NODE_NAME: astra-node-4
+      ASTRAOS_NODE_ROLE: standby-worker
+      ASTRAOS_NODE_WORKLOAD: idle failover pool
+    command: sh -c "pip install fastapi uvicorn psutil && uvicorn distributed.node_agent:app --host 0.0.0.0 --port 9104"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - astra-api
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+    ports:
+      - "3100:3100"
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel-collector.yml"]
+    volumes:
+      - ./otel-collector.yml:/etc/otel-collector.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"
+
+  dashboard:
+    image: node:20-alpine
+    working_dir: /app/dashboard
+    volumes:
+      - ..:/app
+    environment:
+      VITE_ASTRAOS_API_URL: http://localhost:8000
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - astra-api
