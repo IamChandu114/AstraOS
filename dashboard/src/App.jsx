@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import './styles.css';
 
-const API_BASE = import.meta.env.VITE_ASTRAOS_API_URL || 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_ASTRAOS_API_URL;
 const API_TOKEN = import.meta.env.VITE_ASTRAOS_TOKEN || '';
 
 const navItems = [
@@ -741,7 +741,7 @@ function EdgeExecution({ nodes, id }) {
               <RadioTower size={20} />
               <b>{node.telemetry?.name || node.name}</b>
               <small>{node.telemetry?.hostname ? `${node.telemetry.hostname} / ${node.telemetry.role || 'Edge Worker'}` : (node.status || (node.online ? 'online' : 'offline'))}</small>
-              
+
               {node.telemetry ? (
                 <div className="edge-node-telemetry">
                   <div className="telemetry-row"><span>CPU</span><span>{node.telemetry.cpu_percent ?? '—'}%</span></div>
