@@ -145,11 +145,36 @@ async def startup() -> None:
     Path("data").mkdir(exist_ok=True)
     asyncio.create_task(sample_loop())
 
+@app.get("/")
+async def root() -> dict[str, Any]:
+    return {
+        "name": "AstraOS Runtime API",
+        "status": "online",
+        "version": "1.0.0",
+        "message": "AstraOS backend is running",
+        "docs": "/docs",
+        "health": "/health",
+        "metrics": "/metrics",
+    }
 
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {"status": "ok", "samples": len(history), "auth_enabled": bool(TOKEN)}
 
+@app.get("/status", dependencies=[Depends(rate_limit), Depends(authenticate)])
+async def status() -> dict[str, Any]:
+    latest = history[-1] if history else None
+
+    return {
+        "status": "live" if latest else "warming_up",
+        "samples": len(history),
+        "auth_enabled": bool(TOKEN),
+        "latest": latest,
+        "prediction": latest_prediction,
+        "predictive_alerts": latest_predictive_alerts,
+        "distributed": latest_distributed or fabric.snapshot(),
+        "incident_timeline": latest_incident_timeline,
+    }
 
 @app.get("/metrics", dependencies=[Depends(rate_limit), Depends(authenticate)])
 async def metrics(limit: int = 120) -> dict[str, Any]:
