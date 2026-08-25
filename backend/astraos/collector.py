@@ -20,6 +20,20 @@ def _safe_call(default: Any, fn):
         return default
 
 
+def _safe_io_call(default: Any, fn):
+    """Like _safe_call but logs EOVERFLOW (Errno 75) without crashing the whole collect()."""
+    try:
+        return fn()
+    except OSError as exc:
+        # Errno 75 = EOVERFLOW: kernel IO counter overflowed (common on 32-bit /proc counters)
+        # Return default and let caller reset previous reference for clean delta on next tick
+        if exc.errno == 75:
+            return default
+        raise
+    except Exception:
+        return default
+
+
 def _round(value: float | int | None, digits: int = 2) -> float | None:
     if value is None:
         return None
@@ -35,30 +49,35 @@ class TelemetryCollector:
     previous_time: float = field(default_factory=time.time)
 
     def __post_init__(self) -> None:
-        psutil.cpu_percent(interval=None, percpu=True)
-        self.previous_disk = _safe_call(None, psutil.disk_io_counters)
-        self.previous_net = _safe_call(None, psutil.net_io_counters)
+        _safe_call(None, lambda: psutil.cpu_percent(interval=None, percpu=True))
+        self.previous_disk = _safe_io_call(None, psutil.disk_io_counters)
+        self.previous_net = _safe_io_call(None, psutil.net_io_counters)
         self.previous_time = time.time()
 
     def collect(self) -> dict[str, Any]:
         now = time.time()
         elapsed = max(0.001, now - self.previous_time)
-        disk = _safe_call(None, psutil.disk_io_counters)
-        net = _safe_call(None, psutil.net_io_counters)
+        disk = _safe_io_call(None, psutil.disk_io_counters)
+        net = _safe_io_call(None, psutil.net_io_counters)
+        # Reset previous references if IO counters failed (overflow recovery)
+        if disk is None:
+            self.previous_disk = None
+        if net is None:
+            self.previous_net = None
 
         snapshot = {
             "timestamp": now,
-            "host": self._host(),
-            "cpu": self._cpu(),
-            "memory": self._memory(),
-            "swap": self._swap(),
-            "processes": self._processes(),
-            "disk": self._disk(disk, elapsed),
-            "network": self._network(net, elapsed),
-            "thermal": self._thermal(),
-            "gpu": self._gpu(),
-            "battery": self._battery(),
-            "kernel": self._kernel(),
+            "host": _safe_call({}, self._host),
+            "cpu": _safe_call({}, self._cpu),
+            "memory": _safe_call({}, self._memory),
+            "swap": _safe_call({}, self._swap),
+            "processes": _safe_call({"total": 0, "states": {}, "top": []}, self._processes),
+            "disk": _safe_io_call({"root_percent": None, "read_bytes_per_sec": None, "write_bytes_per_sec": None}, lambda: self._disk(disk, elapsed)),
+            "network": _safe_io_call({"bytes_sent_per_sec": None, "bytes_recv_per_sec": None}, lambda: self._network(net, elapsed)),
+            "thermal": _safe_call({"sensors": [], "hottest_c": None}, self._thermal),
+            "gpu": _safe_call({"available": False, "devices": []}, self._gpu),
+            "battery": _safe_call({"available": False}, self._battery),
+            "kernel": _safe_call({"procfs_available": False}, self._kernel),
         }
 
         self.previous_disk = disk
@@ -73,19 +92,19 @@ class TelemetryCollector:
             "system": platform.system(),
             "release": platform.release(),
             "python": platform.python_version(),
-            "boot_time": psutil.boot_time(),
+            "boot_time": _safe_call(None, psutil.boot_time),
         }
 
     def _cpu(self) -> dict[str, Any]:
         freq = _safe_call(None, psutil.cpu_freq)
         stats = _safe_call(None, psutil.cpu_stats)
         load_avg = _safe_call((None, None, None), os.getloadavg) if hasattr(os, "getloadavg") else (None, None, None)
-        per_core = psutil.cpu_percent(interval=None, percpu=True)
+        per_core = _safe_call([], lambda: psutil.cpu_percent(interval=None, percpu=True))
         return {
-            "usage_percent": _round(sum(per_core) / max(1, len(per_core))),
+            "usage_percent": _round(sum(per_core) / max(1, len(per_core))) if per_core else None,
             "per_core_percent": [_round(v) for v in per_core],
-            "logical_cores": psutil.cpu_count(logical=True),
-            "physical_cores": psutil.cpu_count(logical=False),
+            "logical_cores": _safe_call(None, lambda: psutil.cpu_count(logical=True)),
+            "physical_cores": _safe_call(None, lambda: psutil.cpu_count(logical=False)),
             "frequency_mhz": {
                 "current": _round(getattr(freq, "current", None)),
                 "min": _round(getattr(freq, "min", None)),
@@ -97,7 +116,9 @@ class TelemetryCollector:
         }
 
     def _memory(self) -> dict[str, Any]:
-        mem = psutil.virtual_memory()
+        mem = _safe_call(None, psutil.virtual_memory)
+        if not mem:
+            return {}
         return {
             "total_bytes": mem.total,
             "available_bytes": mem.available,
@@ -112,7 +133,9 @@ class TelemetryCollector:
         }
 
     def _swap(self) -> dict[str, Any]:
-        swap = psutil.swap_memory()
+        swap = _safe_call(None, psutil.swap_memory)
+        if not swap:
+            return {}
         return {
             "total_bytes": swap.total,
             "used_bytes": swap.used,
@@ -140,7 +163,7 @@ class TelemetryCollector:
                     "memory_percent": _round(info.get("memory_percent") or 0.0, 3),
                     "nice": info.get("nice"),
                 })
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
+            except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
                 continue
 
         items.sort(key=lambda item: (item["cpu_percent"], item["memory_percent"]), reverse=True)
@@ -209,9 +232,9 @@ class TelemetryCollector:
                     "critical_c": None,
                 })
 
-        hottest = max([s["current_c"] for s in sensors if s["current_c"] is not None], default=None)
+        hottest = max([s["current_c"] for s in sensors if s["current_c"] is not None and s["current_c"] > -100], default=None)
         return {
-            "sensors": sensors,
+            "sensors": [s for s in sensors if s["current_c"] is not None and s["current_c"] > -100],
             "hottest_c": hottest,
         }
 

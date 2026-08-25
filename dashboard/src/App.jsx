@@ -93,17 +93,24 @@ function useLiveTelemetry() {
 
     async function pollMetrics() {
       try {
-        const response = await fetch(apiUrl('/metrics?limit=180'), {
-          headers: API_TOKEN ? { Authorization: `Bearer ${API_TOKEN}` } : {}
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json();
+        const [metricsResp, nodesResp] = await Promise.all([
+          fetch(apiUrl('/metrics?limit=180'), {
+            headers: API_TOKEN ? { Authorization: `Bearer ${API_TOKEN}` } : {}
+          }),
+          fetch(apiUrl('/nodes'), {
+            headers: API_TOKEN ? { Authorization: `Bearer ${API_TOKEN}` } : {}
+          }).catch(() => null)
+        ]);
+        if (!metricsResp.ok) throw new Error(`HTTP ${metricsResp.status}`);
+        const payload = await metricsResp.json();
+        const nodesPayload = nodesResp && nodesResp.ok ? await nodesResp.json() : null;
         if (!closed) {
           setState((previous) => ({
             ...previous,
             status: payload.status === 'live' ? 'REST LIVE' : 'WARMING UP',
             latest: payload.latest || null,
             history: payload.history || [],
+            nodes: nodesPayload,
             error: null
           }));
         }
@@ -335,8 +342,10 @@ function Logo() {
 }
 
 function TopNav({ clock, telemetry }) {
-  const nodes = telemetry.nodes?.nodes || [];
-  const onlineNodes = nodes.filter((node) => node.online).length;
+  const realNodes = telemetry.nodes?.real_edge_nodes?.nodes || [];
+  const simNodes = telemetry.nodes?.distributed_fabric?.nodes || [];
+  const onlineNodes = realNodes.length > 0 ? realNodes.filter((node) => node.online).length : simNodes.filter((node) => node.status === 'online').length;
+  const totalNodes = realNodes.length > 0 ? realNodes.length : simNodes.length;
   const mode = telemetry.prediction?.recommendations?.[0] || 'observe';
   return (
     <header className="top-nav">
@@ -344,7 +353,7 @@ function TopNav({ clock, telemetry }) {
       <div className="nav-status-grid">
         <StatusPill label="System" value={telemetry.latest ? 'ONLINE' : 'WARMING'} tone="cyan" />
         <StatusPill label="AI Engine" value={telemetry.prediction?.status || 'COLLECTING'} tone="purple" />
-        <StatusPill label="Devices" value={`${onlineNodes}/${nodes.length} LINKED`} tone="blue" />
+        <StatusPill label="Devices" value={`${onlineNodes}/${totalNodes} LINKED`} tone="blue" />
         <StatusPill label="Mode" value={mode.replaceAll('_', ' ').toUpperCase()} tone="green" />
         <StatusPill label="Stream" value={telemetry.status} tone="orange" />
       </div>
@@ -871,9 +880,17 @@ function StressPanel() {
   async function activate(mode) {
     setStatus(`Activating ${mode} chaos scenario...`);
     try {
-      const response = await fetch(apiUrl(`/chaos/${mode}?intensity=1&duration_seconds=90`), { method: 'POST' });
+      const response = await fetch(apiUrl(`/chaos/${mode}?intensity=1&duration_seconds=90`), {
+        method: 'POST',
+        headers: API_TOKEN ? { Authorization: `Bearer ${API_TOKEN}` } : {}
+      });
+      if (!response.ok) {
+        const errText = await response.text();
+        setStatus(`Chaos API ${response.status}: ${errText.slice(0, 120)}`);
+        return;
+      }
       const payload = await response.json();
-      setStatus(`${payload.mode} chaos active for distributed fabric`);
+      setStatus(`${payload.mode || mode} chaos active — distributed fabric stressed`);
     } catch (error) {
       setStatus(`Chaos API error: ${error.message}`);
     }

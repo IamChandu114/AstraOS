@@ -19,6 +19,30 @@ def host_capabilities(snapshot: dict[str, Any] | None, kernel: dict[str, Any], c
     battery_active = bool((snapshot or {}).get("battery", {}).get("available"))
     return [
         capability_state(
+            "CPU Telemetry",
+            bool((snapshot or {}).get("cpu")),
+            "CPU telemetry adapter is inactive.",
+            "Check host OS support for psutil CPU queries.",
+        ),
+        capability_state(
+            "Memory Telemetry",
+            bool((snapshot or {}).get("memory")),
+            "Memory telemetry adapter is inactive.",
+            "Check host OS support for psutil memory queries.",
+        ),
+        capability_state(
+            "Disk Telemetry",
+            bool((snapshot or {}).get("disk")),
+            "Disk IO telemetry adapter is inactive.",
+            "Check host OS support for psutil disk queries.",
+        ),
+        capability_state(
+            "Network Telemetry",
+            bool((snapshot or {}).get("network")),
+            "Network IO telemetry adapter is inactive.",
+            "Check host OS support for psutil network queries.",
+        ),
+        capability_state(
             "Thermal Sensors",
             thermal_active,
             "Thermal sensors are not exposed by this host OS or hardware profile.",
