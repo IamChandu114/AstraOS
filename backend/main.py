@@ -39,6 +39,18 @@ from backend.astraos.workload import WorkloadClassifier
 
 TOKEN = os.getenv("ASTRAOS_TOKEN", "")
 DB_PATH = os.getenv("ASTRAOS_DB_PATH", "data/astraos.db")
+DEFAULT_CORS_ORIGINS = (
+    "https://astra-os-mu.vercel.app",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+)
+CORS_ORIGINS = sorted({
+    origin.strip()
+    for origin in os.getenv("ASTRAOS_CORS_ORIGINS", ",".join(DEFAULT_CORS_ORIGINS)).split(",")
+    if origin.strip()
+} | set(DEFAULT_CORS_ORIGINS))
 
 app = FastAPI(
     title="AstraOS Runtime API",
@@ -47,7 +59,7 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ASTRAOS_CORS_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:3000,http://localhost:3000").split(","),
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

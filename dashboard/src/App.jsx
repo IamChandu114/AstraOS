@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import './styles.css';
 
-const API_BASE = import.meta.env.VITE_ASTRAOS_API_URL;
+const API_BASE = import.meta.env.VITE_ASTRAOS_API_URL || 'https://astraos.onrender.com';
 const API_TOKEN = import.meta.env.VITE_ASTRAOS_TOKEN || '';
 
 const navItems = [
@@ -804,12 +804,12 @@ function EdgeExecution({ nodes, id }) {
   );
 }
 
-function SettingsPanel({ elite, id }) {
+function SettingsPanel({ elite, telemetry, id }) {
   const capabilityCount = elite.capabilities?.length || 0;
   const activeCapabilities = (elite.capabilities || []).filter((item) => item.active).length;
   const settings = [
     ['API Endpoint', API_BASE, 'FastAPI telemetry and control plane'],
-    ['Telemetry Mode', elite.status || 'loading', 'Live WebSocket stream with REST fallback'],
+    ['Telemetry Mode', telemetry.status || elite.status || 'loading', 'Live WebSocket stream with REST fallback'],
     ['Host Adapters', `${activeCapabilities}/${capabilityCount} active`, 'Explicit hardware capability states'],
     ['Optimization Safety', 'Guarded actions', 'renice/taskset/cgroup adapters require host permission'],
     ['Proof Mode', '/proof/live', 'Raw JSON evidence, process IDs, and collector sources'],
@@ -1370,7 +1370,7 @@ function App() {
         <IncidentTimelinePanel incident={telemetry.incidentTimeline || elite.incident_timeline} />
         <CapabilityMatrix capabilities={elite.capabilities || []} />
         <Timeline data={chartData} />
-        <SettingsPanel id="settings" elite={elite} />
+        <SettingsPanel id="settings" elite={elite} telemetry={telemetry} />
       </main>
       <aside className="ai-rail">
         <DecisionPanel id="ai-predictions" prediction={telemetry.prediction} telemetry={telemetry} />
