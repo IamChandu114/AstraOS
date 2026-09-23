@@ -17,7 +17,7 @@
 
 **Repository** → [github.com/IamChandu114/AstraOS](https://github.com/IamChandu114/AstraOS)
 
-**Live System** → 
+**Live System** →  https://astra-os-mu.vercel.app/
 
 ---
 
