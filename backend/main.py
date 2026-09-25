@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import time
 from collections import defaultdict, deque
@@ -96,11 +97,23 @@ latest_predictive_alerts: dict[str, Any] | None = None
 latest_incident_timeline: dict[str, Any] | None = None
 pipeline_debug: deque[dict[str, Any]] = deque(maxlen=300)
 rate_window: dict[str, deque[float]] = defaultdict(lambda: deque(maxlen=120))
+BENCHMARK_ARTIFACT = Path(__file__).resolve().parents[1] / "benchmarks" / "real_benchmark.json"
+
+
+def _latest_benchmark() -> dict[str, Any] | None:
+    latest = store.latest("benchmarks")
+    if latest:
+        return latest
+    try:
+        artifact = json.loads(BENCHMARK_ARTIFACT.read_text())
+        return artifact if artifact.get("status") == "real_benchmark" else None
+    except (OSError, ValueError):
+        return None
 
 
 def _optimization_proof() -> dict[str, Any]:
     result = latest_optimization_result or store.latest_action("optimize_apply")
-    return proof_engine.summarize(result, store.latest("benchmarks"))
+    return proof_engine.summarize(result, _latest_benchmark())
 
 
 def authenticate(authorization: str | None = Header(default=None), token: str | None = Query(default=None)) -> None:
@@ -244,12 +257,13 @@ async def optimize(apply: bool = False) -> dict[str, Any]:
     if apply:
         before = await asyncio.to_thread(collector.collect)
         result = await asyncio.to_thread(policy.apply, plan)
-        await asyncio.sleep(1)
-        after = await asyncio.to_thread(collector.collect)
-        result["before"] = before
-        result["after"] = after
-        result["impact"] = _impact(before, after)
-        result["proof"] = proof_engine.summarize(result, store.latest("benchmarks"))
+        if result.get("mode") == "apply":
+            await asyncio.sleep(1)
+            after = await asyncio.to_thread(collector.collect)
+            result["before"] = before
+            result["after"] = after
+            result["impact"] = _impact(before, after)
+            result["proof"] = proof_engine.summarize(result, _latest_benchmark())
         latest_optimization_result = result
     else:
         result = plan
@@ -521,7 +535,7 @@ async def proof_live() -> dict[str, Any]:
     container_state = await asyncio.to_thread(containers.inspect)
     prediction = latest_prediction or (predictor.predict(list(history)) if history else None)
     plan = policy.plan(latest, prediction) if latest else None
-    benchmark = store.latest("benchmarks")
+    benchmark = _latest_benchmark()
     return proofs.build(
         latest,
         list(history),
@@ -574,7 +588,7 @@ async def chaos(mode: str, intensity: float = 1.0, duration_seconds: int = 90) -
 
 @app.get("/benchmarks", dependencies=[Depends(rate_limit), Depends(authenticate)])
 async def benchmarks() -> dict[str, Any]:
-    latest = store.latest("benchmarks")
+    latest = _latest_benchmark()
     return latest or {
         "status": "no_real_benchmark_recorded",
         "message": "Run scripts/run_real_benchmark.py to capture a baseline and optimized report.",

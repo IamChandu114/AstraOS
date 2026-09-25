@@ -8,7 +8,12 @@ class OptimizationProofEngine:
     """Convert before/after runtime snapshots into measurable optimization evidence."""
 
     def summarize(self, optimization_result: dict[str, Any] | None, benchmark: dict[str, Any] | None = None) -> dict[str, Any]:
-        if not optimization_result or not optimization_result.get("before") or not optimization_result.get("after"):
+        if (
+            not optimization_result
+            or optimization_result.get("mode") != "apply"
+            or not optimization_result.get("before")
+            or not optimization_result.get("after")
+        ):
             return {
                 "timestamp": time.time(),
                 "status": "waiting_for_apply_run",
