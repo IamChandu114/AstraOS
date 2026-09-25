@@ -15,11 +15,12 @@
 [![WebSocket](https://img.shields.io/badge/WebSocket-Live%20Streaming-1e90ff?style=flat-square)](#observability-surfaces)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen?style=flat-square)](#)
 
-**Repository** → [github.com/IamChandu114/AstraOS](https://github.com/IamChandu114/AstraOS)
+**Website** → https://astra-os-autonomous-runtime-intelli.vercel.app/
 
 **Live System** →  https://astra-os-mu.vercel.app/
 
-**Website** → https://astra-os-autonomous-runtime-intelli.vercel.app/
+**Repository** → [github.com/IamChandu114/AstraOS](https://github.com/IamChandu114/AstraOS)
+
 ---
 
 <img width="1885" height="909" alt="image" src="https://github.com/user-attachments/assets/37a97fa7-f8be-4b4b-a852-af0b4d67bb11" />
