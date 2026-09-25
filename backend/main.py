@@ -98,6 +98,11 @@ pipeline_debug: deque[dict[str, Any]] = deque(maxlen=300)
 rate_window: dict[str, deque[float]] = defaultdict(lambda: deque(maxlen=120))
 
 
+def _optimization_proof() -> dict[str, Any]:
+    result = latest_optimization_result or store.latest_action("optimize_apply")
+    return proof_engine.summarize(result, store.latest("benchmarks"))
+
+
 def authenticate(authorization: str | None = Header(default=None), token: str | None = Query(default=None)) -> None:
     if not TOKEN:
         return
@@ -429,7 +434,7 @@ async def incident_history(limit: int = 100) -> dict[str, Any]:
 
 @app.get("/optimization/proof", dependencies=[Depends(rate_limit), Depends(authenticate)])
 async def optimization_proof() -> dict[str, Any]:
-    return proof_engine.summarize(latest_optimization_result, store.latest("benchmarks"))
+    return _optimization_proof()
 
 
 @app.post("/optimize/rollback", dependencies=[Depends(rate_limit), Depends(authenticate)])
@@ -502,7 +507,7 @@ async def elite_status() -> dict[str, Any]:
         "reliability_index": alert_state.get("reliability_index"),
         "executive_summary": alert_state.get("executive_summary"),
         "incident_timeline": latest_incident_timeline or incidents.build(list(history)[-240:], latest_prediction, events.recent(120), rca),
-        "optimization_proof": proof_engine.summarize(latest_optimization_result, store.latest("benchmarks")),
+        "optimization_proof": _optimization_proof(),
         "capabilities": host_capabilities(latest, kernel_state, container_state),
         "events": events.recent(30),
         "models": trainer.versions()[:5],

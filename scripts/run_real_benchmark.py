@@ -10,12 +10,12 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "backend"))
+sys.path.insert(0, str(ROOT))
 
-from astraos.collector import TelemetryCollector
-from astraos.policy import OptimizationPolicy
-from astraos.prediction import RealTelemetryPredictor
-from astraos.storage import TelemetryStore
+from backend.astraos.collector import TelemetryCollector
+from backend.astraos.policy import OptimizationPolicy
+from backend.astraos.prediction import RealTelemetryPredictor
+from backend.astraos.storage import TelemetryStore
 
 
 def scheduling_latency(samples: int = 250) -> dict:

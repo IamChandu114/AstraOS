@@ -87,6 +87,14 @@ class TelemetryStore:
                 (time.time(), action, json.dumps(payload)),
             )
 
+    def latest_action(self, action: str) -> dict[str, Any] | None:
+        with self.lock, self._connect() as conn:
+            row = conn.execute(
+                "SELECT payload FROM optimization_logs WHERE action = ? ORDER BY timestamp DESC LIMIT 1",
+                (action,),
+            ).fetchone()
+        return json.loads(row[0]) if row else None
+
     def write_benchmark(self, payload: dict[str, Any]) -> None:
         self._insert("benchmarks", payload.get("timestamp", time.time()), payload)
 

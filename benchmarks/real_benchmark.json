@@ -1,9 +1,10 @@
 {
-  "timestamp": 1779346313.5108736,
+  "timestamp": 1790151300.4320657,
   "status": "real_benchmark",
   "apply_requested": false,
   "optimization_plan": {
-    "timestamp": 1779346245.7692945,
+    "timestamp": 1790151025.836948,
+    "plan_id": "plan-0d146abe4543",
     "mode": "plan",
     "actions": [
       {
@@ -17,6 +18,13 @@
         "safe_default": "recommend_only"
       }
     ],
+    "protected_processes": [],
+    "policy": {
+      "protected_mode": true,
+      "rollback_supported": true,
+      "apply_gate": "ASTRAOS_ENABLE_APPLY=1",
+      "critical_process_protection": "enabled"
+    },
     "requires_apply_enabled": true
   },
   "optimization_result": {
@@ -24,43 +32,43 @@
     "results": []
   },
   "before": {
-    "cpu_percent_avg": 93.97,
-    "memory_percent_avg": 86.71,
+    "cpu_percent_avg": 68.08,
+    "memory_percent_avg": 90.91,
     "thermal_peak_c": null,
-    "processes": 334,
-    "latency_median_ms": 15.7502,
-    "latency_p95_ms": 16.5643,
-    "disk_kbps": 8202.92,
-    "network_rx_kbps": 6.98
+    "processes": 346,
+    "latency_median_ms": 14.4317,
+    "latency_p95_ms": 16.6111,
+    "disk_kbps": 3453.32,
+    "network_rx_kbps": 755.61
   },
   "after": {
-    "cpu_percent_avg": 35.76,
-    "memory_percent_avg": 86.83,
+    "cpu_percent_avg": 84.72,
+    "memory_percent_avg": 91.53,
     "thermal_peak_c": null,
-    "processes": 330,
-    "latency_median_ms": 15.4267,
-    "latency_p95_ms": 16.6367,
-    "disk_kbps": 1375.19,
-    "network_rx_kbps": 1.32
+    "processes": 355,
+    "latency_median_ms": 8.6168,
+    "latency_p95_ms": 16.4856,
+    "disk_kbps": 5562.28,
+    "network_rx_kbps": 258.61
   },
   "metrics": [
     {
       "name": "CPU Latency p95",
       "unit": "ms",
-      "before": 16.5643,
-      "after": 16.6367
+      "before": 16.6111,
+      "after": 16.4856
     },
     {
       "name": "CPU Usage Avg",
       "unit": "%",
-      "before": 93.97,
-      "after": 35.76
+      "before": 68.08,
+      "after": 84.72
     },
     {
       "name": "Memory Usage Avg",
       "unit": "%",
-      "before": 86.71,
-      "after": 86.83
+      "before": 90.91,
+      "after": 91.53
     },
     {
       "name": "Thermal Peak",
@@ -71,8 +79,8 @@
     {
       "name": "Network RX",
       "unit": "KB/s",
-      "before": 6.98,
-      "after": 1.32
+      "before": 755.61,
+      "after": 258.61
     }
   ]
 }
